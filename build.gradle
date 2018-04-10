@@ -1,0 +1,23 @@
+buildscript {
+    ext.kotlin_version = '1.2.30'
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.2.30"
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = 1.8
+}
+
+dependencies {
+    compile "no.tornado:tornadofx:1.7.15"
+}
