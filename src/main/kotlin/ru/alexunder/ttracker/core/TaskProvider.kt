@@ -9,6 +9,9 @@ class TaskProvider {
             Task(id = 4, name = "code upload"),
             Task(id = 5, name = "do nothing"))
 
+    fun getAllTasks() =
+            tasks.toList()
+
     fun getTaskById(id : Int) : Task =
             tasks.first { it.id == id }
 
