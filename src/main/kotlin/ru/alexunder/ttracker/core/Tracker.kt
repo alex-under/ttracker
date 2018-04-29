@@ -10,9 +10,11 @@ object Tracker {
     fun startTracking(task: Task) {
         state.stop()
         state = Tracking(task = task, workLog = workLog)
+        println("tracking task: $task")
     }
 
     fun stopTracking() {
+        println("stopping track")
         state.stop()
         state = Stopped()
     }

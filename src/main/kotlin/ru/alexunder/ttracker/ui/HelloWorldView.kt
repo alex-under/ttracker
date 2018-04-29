@@ -6,10 +6,12 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.input.KeyCode
 import ru.alexunder.ttracker.core.Task
 import ru.alexunder.ttracker.core.TaskProvider
+import ru.alexunder.ttracker.core.Tracker
 import tornadofx.*
 
 class TasksContext : Controller() {
     private val taskProvider = TaskProvider()
+    private val taskTracker = Tracker
     val tasks: SimpleListProperty<Task> = SimpleListProperty()
     val selectedTask: Property<Task> = SimpleObjectProperty()
 
@@ -25,19 +27,30 @@ class TasksContext : Controller() {
             tasks.value.addAll(it)
         }
     }
+
+    fun startSelected() {
+        taskTracker.startTracking(selectedTask.value)
+    }
+
+    fun startNew(name: String) {
+        val createdTask = taskProvider.createTask(name)
+        taskTracker.startTracking(createdTask)
+    }
 }
 
 object UpKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
 object DownKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
 object EnterKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
-class SearchStringChanged(val value : String) : FXEvent(EventBus.RunOn.BackgroundThread)
+class SearchStringChanged(val value: String) : FXEvent(EventBus.RunOn.BackgroundThread)
 
 class SearchQueryView : View() {
     private val context: TasksContext by inject()
+    var searchString = ""
 
     override val root = hbox {
         textfield {
             textProperty().addListener { _, _, newValue ->
+                searchString = newValue
                 fire(SearchStringChanged(newValue))
             }
 
@@ -46,7 +59,8 @@ class SearchQueryView : View() {
                     KeyCode.DOWN -> fire(DownKeyPressed)
                     KeyCode.UP -> fire(UpKeyPressed)
                     KeyCode.ENTER -> fire(EnterKeyPressed)
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
 
@@ -58,12 +72,21 @@ class SearchQueryView : View() {
                 text = if (task == null) "create" else "start"
             }
             subscribe<EnterKeyPressed> {
-                println("enter pressed")
+                start()
             }
             action {
-                println("mose clicked")
+                start()
             }
             isFocusTraversable = false
+        }
+
+    }
+
+    private fun start() {
+        if (context.selectedTask.value != null) {
+            context.startSelected()
+        } else {
+            context.startNew(searchString)
         }
     }
 }
