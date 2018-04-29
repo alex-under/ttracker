@@ -3,6 +3,7 @@ package ru.alexunder.ttracker.ui
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.input.KeyCode
 import ru.alexunder.ttracker.core.Task
 import ru.alexunder.ttracker.core.TaskProvider
 import tornadofx.*
@@ -18,34 +19,53 @@ class TasksContext : Controller() {
 
     fun search(name: String) {
         runAsync {
-            taskProvider.findTaskByName(name).observable()
+            taskProvider.findTaskByName(name)
         } ui {
-            tasks.value = it
+            tasks.value.clear()
+            tasks.value.addAll(it)
         }
     }
 }
 
-class SearchView : View() {
-    private val context: TasksContext by inject()
+object UpKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
+object DownKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
+object EnterKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
+class SearchStringChanged(val value : String) : FXEvent(EventBus.RunOn.BackgroundThread)
+
+class SearchQueryView : View() {
 
     override val root = hbox {
         textfield {
             textProperty().addListener { _, _, newValue ->
-                context.search(newValue)
+                fire(SearchStringChanged(newValue))
             }
 
             setOnKeyPressed { event ->
-                println("key event: $event")
+                when (event.code) {
+                    KeyCode.DOWN -> fire(DownKeyPressed)
+                    KeyCode.UP -> fire(UpKeyPressed)
+                    KeyCode.ENTER -> fire(EnterKeyPressed)
+                    else -> {}
+                }
+                println("textfield key event: $event")
             }
+
             requestFocus()
         }
+
         button("start") {
+            subscribe<EnterKeyPressed> {
+                println("enter pressed")
+            }
+            action {
+                println("mose clicked")
+            }
             isFocusTraversable = false
         }
     }
 }
 
-class SearchResults : View() {
+class SearchResultsView : View() {
     private val context: TasksContext by inject()
 
     override val root = tableview(context.tasks) {
@@ -54,32 +74,35 @@ class SearchResults : View() {
         bindSelected(context.selectedTask)
         columnResizePolicy = SmartResize.POLICY
         isFocusTraversable = false
+        selectFirst()
+
+        items.onChange {
+            println("items changed")
+            selectFirst()
+        }
+
+        subscribe<SearchStringChanged> { event ->
+            context.search(event.value)
+        }
+
+        subscribe<UpKeyPressed> {
+            selectionModel.select(selectionModel.selectedIndex - 1)
+        }
+        subscribe<DownKeyPressed> {
+            selectionModel.select(selectionModel.selectedIndex + 1)
+        }
     }
 }
 
 class HelloWorldView : View() {
-    private val searchView: SearchView by inject()
-    private val searchResults: SearchResults by inject()
+    private val searchQueryView: SearchQueryView by inject()
+    private val searchResultsView: SearchResultsView by inject()
 
     override val root = vbox {
-/*
-        addEventHandler(Event.ANY) { event ->
-            if (event is KeyEvent) {
-                searchView.fire(event.copyFor(searchView, searchView))
-                event.consume()
-            }
-        }
-*/
-/*        addEventFilter(KeyEvent.KEY_PRESSED, { event ->
-            if (event.code == KeyCode.DOWN || event.code == KeyCode.UP || event.code == KeyCode.LEFT
-                    || event.code == KeyCode.RIGHT) {
-                event.consume()
-                println("consumed event: $event")
-            }
-        })*/
-
-        add(searchView)
-        add(searchResults)
+        requestFocus()
+        add(searchQueryView)
+        add(searchResultsView)
+        isFocusTraversable = false
     }
 }
 
