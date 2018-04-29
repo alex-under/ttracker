@@ -10,7 +10,7 @@ import tornadofx.*
 
 class TasksContext : Controller() {
     private val taskProvider = TaskProvider()
-    val tasks = SimpleListProperty<Task>()
+    val tasks: SimpleListProperty<Task> = SimpleListProperty()
     val selectedTask: Property<Task> = SimpleObjectProperty()
 
     init {
@@ -33,6 +33,7 @@ object EnterKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
 class SearchStringChanged(val value : String) : FXEvent(EventBus.RunOn.BackgroundThread)
 
 class SearchQueryView : View() {
+    private val context: TasksContext by inject()
 
     override val root = hbox {
         textfield {
@@ -47,13 +48,15 @@ class SearchQueryView : View() {
                     KeyCode.ENTER -> fire(EnterKeyPressed)
                     else -> {}
                 }
-                println("textfield key event: $event")
             }
 
             requestFocus()
         }
 
         button("start") {
+            context.selectedTask.onChange { task ->
+                text = if (task == null) "create" else "start"
+            }
             subscribe<EnterKeyPressed> {
                 println("enter pressed")
             }
@@ -72,19 +75,16 @@ class SearchResultsView : View() {
         readonlyColumn("id", Task::id)
         readonlyColumn("name", Task::name)
         bindSelected(context.selectedTask)
+        selectFirst()
         columnResizePolicy = SmartResize.POLICY
         isFocusTraversable = false
-        selectFirst()
 
         items.onChange {
-            println("items changed")
             selectFirst()
         }
-
         subscribe<SearchStringChanged> { event ->
             context.search(event.value)
         }
-
         subscribe<UpKeyPressed> {
             selectionModel.select(selectionModel.selectedIndex - 1)
         }
@@ -99,7 +99,6 @@ class HelloWorldView : View() {
     private val searchResultsView: SearchResultsView by inject()
 
     override val root = vbox {
-        requestFocus()
         add(searchQueryView)
         add(searchResultsView)
         isFocusTraversable = false
