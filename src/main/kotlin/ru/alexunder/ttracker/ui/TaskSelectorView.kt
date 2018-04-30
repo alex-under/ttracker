@@ -1,9 +1,11 @@
 package ru.alexunder.ttracker.ui
 
+import javafx.application.Platform
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.input.KeyCode
+import javafx.stage.Stage
 import ru.alexunder.ttracker.core.Task
 import ru.alexunder.ttracker.core.TaskProvider
 import ru.alexunder.ttracker.core.Tracker
@@ -117,7 +119,7 @@ class SearchResultsView : View() {
     }
 }
 
-class HelloWorldView : View() {
+class TaskSelectorView : View() {
     private val searchQueryView: SearchQueryView by inject()
     private val searchResultsView: SearchResultsView by inject()
 
@@ -128,4 +130,29 @@ class HelloWorldView : View() {
     }
 }
 
-class HelloWorldApp : App(HelloWorldView::class)
+class TaskTrackerApp : App(TaskSelectorView::class) {
+    override fun start(stage: Stage) {
+        super.start(stage)
+
+        trayicon(resources.stream("/tray-inactive.png")) {
+            setOnMouseClicked(fxThread = true) {
+                FX.primaryStage.show()
+                FX.primaryStage.toFront()
+            }
+
+            menu("MyApp") {
+                item("Show...") {
+                    setOnAction(fxThread = true) {
+                        FX.primaryStage.show()
+                        FX.primaryStage.toFront()
+                    }
+                }
+                item("Exit") {
+                    setOnAction(fxThread = true) {
+                        Platform.exit()
+                    }
+                }
+            }
+        }
+    }
+}
