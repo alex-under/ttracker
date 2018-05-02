@@ -1,6 +1,7 @@
 package ru.alexunder.ttracker.ui
 
-import javafx.application.Platform
+import dorkbox.systemTray.MenuItem
+import dorkbox.systemTray.SystemTray
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -10,6 +11,9 @@ import ru.alexunder.ttracker.core.Task
 import ru.alexunder.ttracker.core.TaskProvider
 import ru.alexunder.ttracker.core.Tracker
 import tornadofx.*
+import java.awt.event.ActionListener
+import java.io.IOException
+
 
 class TasksContext : Controller() {
     private val taskProvider = TaskProvider()
@@ -32,15 +36,23 @@ class TasksContext : Controller() {
 
     fun startSelected() {
         taskTracker.startTracking(selectedTask.value)
+        notifyStateChange()
     }
 
     fun startNew(name: String) {
         val createdTask = taskProvider.createTask(name)
         taskTracker.startTracking(createdTask)
+        notifyStateChange()
+    }
+
+    fun notifyStateChange() {
+        fire(TrackingStateChanged)
     }
 }
 
-object UpKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
+object TrackingStateChanged : FXEvent(EventBus.RunOn.ApplicationThread)
+
+object UpKeyPressed : FXEvent(EventBus.RunOn.BackgroundThread)
 object DownKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
 object EnterKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
 class SearchStringChanged(val value: String) : FXEvent(EventBus.RunOn.BackgroundThread)
@@ -131,28 +143,34 @@ class TaskSelectorView : View() {
 }
 
 class TaskTrackerApp : App(TaskSelectorView::class) {
+
+    private val context: TasksContext by inject()
+
+
     override fun start(stage: Stage) {
         super.start(stage)
 
-        trayicon(resources.stream("/tray-inactive.png")) {
-            setOnMouseClicked(fxThread = true) {
-                FX.primaryStage.show()
-                FX.primaryStage.toFront()
-            }
+        SystemTray.AUTO_SIZE = false
 
-            menu("MyApp") {
-                item("Show...") {
-                    setOnAction(fxThread = true) {
-                        FX.primaryStage.show()
-                        FX.primaryStage.toFront()
-                    }
-                }
-                item("Exit") {
-                    setOnAction(fxThread = true) {
-                        Platform.exit()
-                    }
-                }
-            }
+        val systemTray = SystemTray.get() ?: throw RuntimeException("Unable to load SystemTray!")
+
+        try {
+            systemTray.setTooltip("no success :(")
+            systemTray.setImage("/home/alex/downloads/clock-circular-outline (4).png")
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
+
+
+        systemTray.status = "tracking..."
+
+
+        systemTray.menu.add(MenuItem("Quit", ActionListener {
+            systemTray.shutdown()
+            //System.exit(0);  not necessary if all non-daemon threads have stopped.
+        })).shortcut = 'q' // case does not matter
+
+        systemTray.menu.add(MenuItem("Test"))
+
     }
 }

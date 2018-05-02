@@ -19,5 +19,11 @@ compileKotlin {
 }
 
 dependencies {
+    def withoutSwtGtk = {
+        exclude group: 'org.eclipse.swt', module: 'org.eclipse.swt.gtk.linux.x86_64'
+    }
+
     compile "no.tornado:tornadofx:1.7.15"
+    compile "com.dorkbox:SystemTray:3.13", withoutSwtGtk
+    compile group: 'org.eclipse.swt', name: 'org.eclipse.swt.gtk.linux.x86_64', version: '4.3'
 }
