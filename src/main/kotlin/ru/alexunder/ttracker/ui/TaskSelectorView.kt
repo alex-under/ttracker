@@ -10,7 +10,7 @@ import ru.alexunder.ttracker.core.Tracker
 import tornadofx.*
 
 
-class TasksContext : Controller() {
+class TaskSelectorController : Controller() {
     private val taskProvider = TaskProvider()
     private val taskTracker = Tracker
     val tasks: SimpleListProperty<Task> = SimpleListProperty()
@@ -53,7 +53,7 @@ object EnterKeyPressed : FXEvent(EventBus.RunOn.ApplicationThread)
 class SearchStringChanged(val value: String) : FXEvent(EventBus.RunOn.BackgroundThread)
 
 class SearchQueryView : View() {
-    private val context: TasksContext by inject()
+    private val context: TaskSelectorController by inject()
     var searchString = ""
 
     override val root = hbox {
@@ -101,7 +101,7 @@ class SearchQueryView : View() {
 }
 
 class SearchResultsView : View() {
-    private val context: TasksContext by inject()
+    private val context: TaskSelectorController by inject()
 
     override val root = tableview(context.tasks) {
         readonlyColumn("id", Task::id)
