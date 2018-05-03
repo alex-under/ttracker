@@ -24,6 +24,7 @@ dependencies {
     }
 
     compile 'no.tornado:tornadofx:1.7.15'
+    compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
     compile 'com.dorkbox:SystemTray:3.13', withoutSwtGtk
     compile 'org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:4.3'
     compile 'ch.qos.logback:logback-classic:1.0.13'
