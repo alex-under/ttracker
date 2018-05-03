@@ -1,11 +1,14 @@
 package ru.alexunder.ttracker.core
 
+import ru.alexunder.ttracker.core.events.RxBus
+import ru.alexunder.ttracker.core.events.TrackingStarted
+import ru.alexunder.ttracker.core.events.TrackingStopped
 import java.time.LocalDateTime
 
 object Tracker {
 
     private val workLog: WorkLog = WorkLog()
-    var state: TrackerState = Stopped()
+    private var state: TrackerState = Stopped()
 
     fun startTracking(task: Task) {
         state.stop()
@@ -35,7 +38,14 @@ data class Tracking(
         val from: LocalDateTime = LocalDateTime.now(),
         val workLog: WorkLog
 ) : TrackerState() {
+
+    init {
+        RxBus.publish(TrackingStarted(task, from))
+    }
+
     override fun stop() {
-        workLog.addItem(task = task, from = from, to = LocalDateTime.now())
+        val to = LocalDateTime.now()
+        RxBus.publish(TrackingStopped(task, from, to))
+        workLog.addItem(task = task, from = from, to = to)  // todo log by event
     }
 }
