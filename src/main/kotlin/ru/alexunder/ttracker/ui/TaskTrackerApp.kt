@@ -22,7 +22,9 @@ class TaskTrackerApp : App(TaskSelectorView::class) {
         SystemTray.AUTO_SIZE = false
         val systemTray = SystemTray.get() ?: throw RuntimeException("Failed to init dorkbox.SystemTray")
 
-        systemTray.setImage("/home/alex/downloads/clock-circular-outline (4).png")
+
+
+        systemTray.setImage(Resources.activeImage)
         systemTray.status = "tracking..."
 
         systemTray.menu.add(MenuItem("Quit", ActionListener {
