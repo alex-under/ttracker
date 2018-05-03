@@ -126,7 +126,7 @@ class SearchResultsView : View() {
     }
 }
 
-class TaskSelectorView : View() {
+class TaskSelectorView : View("Select task") {
     private val searchQueryView: SearchQueryView by inject()
     private val searchResultsView: SearchResultsView by inject()
 
