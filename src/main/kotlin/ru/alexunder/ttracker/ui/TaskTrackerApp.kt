@@ -2,6 +2,8 @@ package ru.alexunder.ttracker.ui
 
 import dorkbox.systemTray.MenuItem
 import dorkbox.systemTray.SystemTray
+import dorkbox.util.JavaFX
+import javafx.application.Platform
 import javafx.stage.Stage
 import tornadofx.*
 import java.awt.event.ActionListener
@@ -25,9 +27,23 @@ class TaskTrackerApp : App(TaskSelectorView::class) {
 
         systemTray.menu.add(MenuItem("Quit", ActionListener {
             systemTray.shutdown()
-            stage.close()
-            System.exit(0)  // not necessary if all non-daemon threads have stopped.
+            shutdownFxApp(stage)
         }))
+
         systemTray.menu.add(MenuItem("Test"))
+    }
+
+    private fun shutdownFxApp(stage: Stage) {
+        val quit = {
+            stage.hide()
+            Platform.exit()
+        }
+        if (JavaFX.isEventThread()) {
+            quit.invoke()
+        } else {
+            JavaFX.dispatch {
+                quit.invoke()
+            }
+        }
     }
 }
