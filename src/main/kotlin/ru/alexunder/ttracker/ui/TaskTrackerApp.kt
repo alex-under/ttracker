@@ -7,6 +7,7 @@ import javafx.application.Platform
 import javafx.stage.Stage
 import tornadofx.*
 import java.awt.event.ActionListener
+import javax.swing.JSeparator
 
 class TaskTrackerApp : App(TaskSelectorView::class) {
 
@@ -21,18 +22,27 @@ class TaskTrackerApp : App(TaskSelectorView::class) {
     private fun intiTray(stage: Stage) {
         SystemTray.AUTO_SIZE = false
         val systemTray = SystemTray.get() ?: throw RuntimeException("Failed to init dorkbox.SystemTray")
-
-
-
         systemTray.setImage(Resources.activeImage)
         systemTray.status = "tracking..."
+        buildMenu(systemTray, stage)
+    }
+
+    private fun buildMenu(systemTray: SystemTray, stage: Stage) {
+
+        systemTray.menu.add(MenuItem("Set active", ActionListener {
+            systemTray.setImage(Resources.activeImage)
+        }))
+
+        systemTray.menu.add(MenuItem("Set inactive", ActionListener {
+            systemTray.setImage(Resources.inactiveImage)
+        }))
+
+        systemTray.menu.add(JSeparator())
 
         systemTray.menu.add(MenuItem("Quit", ActionListener {
             systemTray.shutdown()
             shutdownFxApp(stage)
         }))
-
-        systemTray.menu.add(MenuItem("Test"))
     }
 
     private fun shutdownFxApp(stage: Stage) {
