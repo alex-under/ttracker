@@ -11,20 +11,29 @@ import javax.swing.JSeparator
 
 class TaskTrackerApp : App(TaskSelectorView::class) {
 
-    private val context: TasksContext by inject()
+    private val context: TaskSelectorController by inject()
+
+
 
 
     override fun start(stage: Stage) {
         super.start(stage)
-        intiTray(stage)
+        val tray = intiTray(stage)
+
+
+
+        context.selectedTask.onChange { task ->
+            tray.status = task?.name
+        }
     }
 
-    private fun intiTray(stage: Stage) {
+    private fun intiTray(stage: Stage) : SystemTray {
         SystemTray.AUTO_SIZE = false
         val systemTray = SystemTray.get() ?: throw RuntimeException("Failed to init dorkbox.SystemTray")
         systemTray.setImage(Resources.activeImage)
         systemTray.status = "tracking..."
         buildMenu(systemTray, stage)
+        return systemTray
     }
 
     private fun buildMenu(systemTray: SystemTray, stage: Stage) {
