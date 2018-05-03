@@ -5,45 +5,48 @@ import dorkbox.systemTray.SystemTray
 import dorkbox.util.JavaFX
 import javafx.application.Platform
 import javafx.stage.Stage
+import ru.alexunder.ttracker.core.Tracker
+import ru.alexunder.ttracker.core.events.RxBus
+import ru.alexunder.ttracker.core.events.TrackingStarted
+import ru.alexunder.ttracker.core.events.TrackingStopped
 import tornadofx.*
 import java.awt.event.ActionListener
 import javax.swing.JSeparator
 
 class TaskTrackerApp : App(TaskSelectorView::class) {
 
-    private val context: TaskSelectorController by inject()
-
-
+    private val tracker = Tracker
 
 
     override fun start(stage: Stage) {
         super.start(stage)
-        val tray = intiTray(stage)
-
-
-
-        context.selectedTask.onChange { task ->
-            tray.status = task?.name
-        }
+        val tray = initTray(stage)
+        subscribeForTrackerEvents(tray)
     }
 
-    private fun intiTray(stage: Stage) : SystemTray {
+    private fun initTray(stage: Stage) : SystemTray {
         SystemTray.AUTO_SIZE = false
         val systemTray = SystemTray.get() ?: throw RuntimeException("Failed to init dorkbox.SystemTray")
-        systemTray.setImage(Resources.activeImage)
-        systemTray.status = "tracking..."
+        systemTray.setImage(Resources.inactiveImage)
         buildMenu(systemTray, stage)
         return systemTray
     }
 
+    private fun subscribeForTrackerEvents(tray: SystemTray) {
+        RxBus.listen(TrackingStarted::class.java).subscribe { startEvent ->
+            tray.setImage(Resources.activeImage)
+            tray.status = "tracking ${startEvent.task.name} from ${startEvent.startedAt}"
+        }
+        RxBus.listen(TrackingStopped::class.java).subscribe { stopEvent ->
+            tray.setImage(Resources.inactiveImage)
+            tray.status = "idle"
+        }
+    }
+
     private fun buildMenu(systemTray: SystemTray, stage: Stage) {
 
-        systemTray.menu.add(MenuItem("Set active", ActionListener {
-            systemTray.setImage(Resources.activeImage)
-        }))
-
-        systemTray.menu.add(MenuItem("Set inactive", ActionListener {
-            systemTray.setImage(Resources.inactiveImage)
+        systemTray.menu.add(MenuItem("Stop tracking", ActionListener {
+            tracker.stopTracking()
         }))
 
         systemTray.menu.add(JSeparator())
