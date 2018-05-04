@@ -27,5 +27,6 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
     compile 'com.dorkbox:SystemTray:3.13', withoutSwtGtk
     compile 'org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:4.3'
+    compile 'com.1stleg:jnativehook:2.1.0'
     compile 'ch.qos.logback:logback-classic:1.0.13'
 }
