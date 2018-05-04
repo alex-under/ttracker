@@ -20,6 +20,8 @@ class TaskTrackerApp : App(TaskSelectorView::class) {
 
     override fun start(stage: Stage) {
         super.start(stage)
+        Platform.setImplicitExit(false)
+        FX.primaryStage.hide()
         val tray = initTray(stage)
         subscribeForTrackerEvents(tray)
     }
@@ -44,6 +46,12 @@ class TaskTrackerApp : App(TaskSelectorView::class) {
     }
 
     private fun buildMenu(systemTray: SystemTray, stage: Stage) {
+
+        systemTray.menu.add(MenuItem("Select task...", ActionListener {
+            JavaFX.dispatch {
+                FX.primaryStage.show()
+            }
+        }))
 
         systemTray.menu.add(MenuItem("Stop tracking", ActionListener {
             tracker.stopTracking()

@@ -32,12 +32,14 @@ class TaskSelectorController : Controller() {
     fun startSelected() {
         taskTracker.startTracking(selectedTask.value)
         notifyStateChange()
+        FX.primaryStage.hide()
     }
 
     fun startNew(name: String) {
         val createdTask = taskProvider.createTask(name)
         taskTracker.startTracking(createdTask)
         notifyStateChange()
+        FX.primaryStage.hide()
     }
 
     private fun notifyStateChange() {
