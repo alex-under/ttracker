@@ -40,7 +40,7 @@ class TaskSelectorController : Controller() {
         notifyStateChange()
     }
 
-    fun notifyStateChange() {
+    private fun notifyStateChange() {
         fire(TrackingStateChanged)
     }
 }
