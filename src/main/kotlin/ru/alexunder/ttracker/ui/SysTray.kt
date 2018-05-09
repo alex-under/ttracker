@@ -3,7 +3,6 @@ package ru.alexunder.ttracker.ui
 import dorkbox.systemTray.MenuItem
 import dorkbox.systemTray.SystemTray
 import dorkbox.util.JavaFX
-import javafx.application.Platform
 import javafx.stage.Stage
 import ru.alexunder.ttracker.core.Tracker
 import ru.alexunder.ttracker.core.events.RxBus
@@ -14,7 +13,8 @@ import javax.swing.JSeparator
 
 class SysTray(
         private val taskSelectStage: Stage,
-        private val workLogStage: Stage) {
+        private val workLogStage: Stage,
+        private val shutdownRunnable: () -> Unit) {
 
     private val tracker = Tracker
     private lateinit var stopMenuItem: MenuItem
@@ -70,22 +70,7 @@ class SysTray(
 
         systemTray.menu.add(MenuItem("Quit", ActionListener {
             systemTray.shutdown()
-            shutdownFxApp()
+            shutdownRunnable.invoke()
         }))
-    }
-
-    private fun shutdownFxApp() {
-        val quit = {
-            taskSelectStage.hide()
-            workLogStage.hide()
-            Platform.exit()
-        }
-        if (JavaFX.isEventThread()) {
-            quit.invoke()
-        } else {
-            JavaFX.dispatch {
-                quit.invoke()
-            }
-        }
     }
 }
