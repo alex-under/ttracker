@@ -16,6 +16,7 @@ import javax.swing.JSeparator
 class SysTray(stage : Stage) {
 
     private val tracker = Tracker
+    private lateinit var stopMenuItem: MenuItem
 
     init {
         val tray = initTray()
@@ -34,10 +35,12 @@ class SysTray(stage : Stage) {
         RxBus.listen(TrackingStarted::class.java).subscribe { startEvent ->
             tray.setImage(Resources.activeImage)
             tray.status = "tracking ${startEvent.task.name} from ${startEvent.startedAt}"
+            stopMenuItem.enabled = true
         }
         RxBus.listen(TrackingStopped::class.java).subscribe { stopEvent ->
             tray.setImage(Resources.inactiveImage)
             tray.status = "idle"
+            stopMenuItem.enabled = false
         }
     }
 
@@ -49,7 +52,7 @@ class SysTray(stage : Stage) {
             }
         }))
 
-        systemTray.menu.add(MenuItem("Stop tracking", ActionListener {
+        stopMenuItem = systemTray.menu.add(MenuItem("Stop tracking", ActionListener {
             tracker.stopTracking()
         }))
 
