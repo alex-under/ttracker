@@ -1,5 +1,7 @@
 package ru.alexunder.ttracker.core
 
+import ru.alexunder.ttracker.core.events.RxBus
+import ru.alexunder.ttracker.core.events.WorkItemAdded
 import java.time.LocalDateTime
 
 object WorkLog {
@@ -13,7 +15,9 @@ object WorkLog {
     }
 
     fun addItem(task: Task, from: LocalDateTime, to: LocalDateTime) {
-        workItems.add(WorkItem(task, from, to))
+        val workItem = WorkItem(task, from, to)
+        workItems.add(workItem)
+        RxBus.publish(WorkItemAdded(workItem))
     }
 
     fun workItems() =
