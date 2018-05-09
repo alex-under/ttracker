@@ -2,7 +2,7 @@ package ru.alexunder.ttracker.core
 
 class TaskProvider {
 
-    private var idSeq: Long = 1
+    private var idSeq: Long = 0
     private val tasks: MutableList<Task> = mutableListOf(
             Task(id = nextId(), name = "create something"),
             Task(id = nextId(), name = "qa"),
