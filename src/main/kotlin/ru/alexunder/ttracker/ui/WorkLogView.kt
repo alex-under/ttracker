@@ -21,8 +21,7 @@ class WorkLogController : Controller() {
     }
 }
 
-class WorkLogView : View() {
-
+class WorkLogView : View("Work log") {
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("hh:MM")
     private val controller: WorkLogController by inject()
 
