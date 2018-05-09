@@ -38,7 +38,7 @@ class SysTray(
             tray.status = "tracking ${startEvent.task.name} from ${startEvent.startedAt}"
             stopMenuItem.enabled = true
         }
-        RxBus.listen(TrackingStopped::class.java).subscribe { stopEvent ->
+        RxBus.listen(TrackingStopped::class.java).subscribe { _ ->
             tray.setImage(Resources.inactiveImage)
             tray.status = "idle"
             stopMenuItem.enabled = false
@@ -57,7 +57,7 @@ class SysTray(
             tracker.stopTracking()
         }))
 
-        systemTray.menu.add(MenuItem("Work log", ActionListener {
+        systemTray.menu.add(MenuItem("Work log...", ActionListener {
             JavaFX.dispatch {
                 workLogStage.show()
             }
