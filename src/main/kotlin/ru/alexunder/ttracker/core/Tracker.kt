@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 object Tracker {
 
-    private val workLog: WorkLog = WorkLog()
+    private val workLog = WorkLog
     private var state: TrackerState = Stopped()
 
     fun startTracking(task: Task) {

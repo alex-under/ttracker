@@ -2,7 +2,7 @@ package ru.alexunder.ttracker.core
 
 import java.time.LocalDateTime
 
-class WorkLog {
+object WorkLog {
 
     private val workItems : MutableList<WorkItem> = ArrayList()
 
@@ -10,5 +10,7 @@ class WorkLog {
         workItems.add(WorkItem(task, from, to))
     }
 
+    fun workItems() =
+            workItems
 
 }

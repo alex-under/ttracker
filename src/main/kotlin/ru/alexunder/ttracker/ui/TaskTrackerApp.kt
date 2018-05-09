@@ -1,6 +1,7 @@
 package ru.alexunder.ttracker.ui
 
 import javafx.application.Platform
+import javafx.scene.Scene
 import javafx.stage.Stage
 import tornadofx.*
 
@@ -13,8 +14,15 @@ class TaskTrackerApp : App(TaskSelectorView::class) {
         super.start(stage)
         Platform.setImplicitExit(false)
         stage.hide()
-        tray = SysTray(stage)
+        val workLogStage = buildWorkLogStage()
+        tray = SysTray(stage, workLogStage)
         keyHook = GlobalKeyHook(stage)
         keyHook.registerKeyHook()
+    }
+
+    private fun buildWorkLogStage(): Stage {
+        val newStage = Stage()
+        newStage.scene = Scene(WorkLogView().root)
+        return newStage
     }
 }

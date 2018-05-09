@@ -9,18 +9,19 @@ import ru.alexunder.ttracker.core.Tracker
 import ru.alexunder.ttracker.core.events.RxBus
 import ru.alexunder.ttracker.core.events.TrackingStarted
 import ru.alexunder.ttracker.core.events.TrackingStopped
-import tornadofx.*
 import java.awt.event.ActionListener
 import javax.swing.JSeparator
 
-class SysTray(stage : Stage) {
+class SysTray(
+        private val taskSelectStage: Stage,
+        private val workLogStage: Stage) {
 
     private val tracker = Tracker
     private lateinit var stopMenuItem: MenuItem
 
     init {
         val tray = initTray()
-        buildMenu(tray, stage)
+        buildMenu(tray)
         subscribeForTrackerEvents(tray)
     }
 
@@ -44,11 +45,11 @@ class SysTray(stage : Stage) {
         }
     }
 
-    private fun buildMenu(systemTray: SystemTray, stage: Stage) {
+    private fun buildMenu(systemTray: SystemTray) {
 
         systemTray.menu.add(MenuItem("Select task...", ActionListener {
             JavaFX.dispatch {
-                FX.primaryStage.show()
+                taskSelectStage.show()
             }
         }))
 
@@ -56,17 +57,24 @@ class SysTray(stage : Stage) {
             tracker.stopTracking()
         }))
 
+        systemTray.menu.add(MenuItem("Work log", ActionListener {
+            JavaFX.dispatch {
+                workLogStage.show()
+            }
+        }))
+
         systemTray.menu.add(JSeparator())
 
         systemTray.menu.add(MenuItem("Quit", ActionListener {
             systemTray.shutdown()
-            shutdownFxApp(stage)
+            shutdownFxApp()
         }))
     }
 
-    private fun shutdownFxApp(stage: Stage) {
+    private fun shutdownFxApp() {
         val quit = {
-            stage.hide()
+            taskSelectStage.hide()
+            workLogStage.hide()
             Platform.exit()
         }
         if (JavaFX.isEventThread()) {
