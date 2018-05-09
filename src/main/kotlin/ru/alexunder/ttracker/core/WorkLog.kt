@@ -20,7 +20,7 @@ object WorkLog {
         RxBus.publish(WorkItemAdded(workItem))
     }
 
-    fun workItems() =
+    fun workItems() : List<WorkItem> =
             workItems
 
 }
