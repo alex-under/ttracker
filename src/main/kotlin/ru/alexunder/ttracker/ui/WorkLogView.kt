@@ -42,9 +42,6 @@ class WorkLogView : View("Work log") {
             }
         }
 
-        items.onChange {
-            println("items now: $items")
-        }
         columnResizePolicy = SmartResize.POLICY
     }
 }
