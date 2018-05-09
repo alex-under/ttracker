@@ -1,4 +1,4 @@
-package ru.alexunder.ttracker.ui
+package ru.alexunder.ttracker.ui.views
 
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleListProperty

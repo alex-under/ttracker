@@ -4,6 +4,8 @@ import dorkbox.util.JavaFX
 import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.stage.Stage
+import ru.alexunder.ttracker.ui.views.TaskSelectorView
+import ru.alexunder.ttracker.ui.views.WorkLogView
 import tornadofx.*
 
 class TaskTrackerApp : App(TaskSelectorView::class) {

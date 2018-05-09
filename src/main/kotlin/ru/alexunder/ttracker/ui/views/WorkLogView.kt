@@ -1,10 +1,11 @@
-package ru.alexunder.ttracker.ui
+package ru.alexunder.ttracker.ui.views
 
 import javafx.beans.property.SimpleListProperty
 import ru.alexunder.ttracker.core.WorkItem
 import ru.alexunder.ttracker.core.WorkLog
 import ru.alexunder.ttracker.core.events.RxBus
 import ru.alexunder.ttracker.core.events.WorkItemAdded
+import ru.alexunder.ttracker.ui.Formats
 import tornadofx.*
 
 class WorkLogController : Controller() {
