@@ -55,15 +55,16 @@ class SysTray(
             }
         }))
 
-        stopMenuItem = systemTray.menu.add(MenuItem("Stop tracking", ActionListener {
-            tracker.stopTracking()
-        }))
-
         systemTray.menu.add(MenuItem("Work log...", ActionListener {
             JavaFX.dispatch {
                 workLogStage.show()
             }
         }))
+
+        stopMenuItem = systemTray.menu.add(MenuItem("Stop tracking", ActionListener {
+            tracker.stopTracking()
+        }))
+        stopMenuItem.enabled = tracker.isTracking()
 
         systemTray.menu.add(JSeparator())
 

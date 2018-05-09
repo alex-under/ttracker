@@ -21,6 +21,9 @@ object Tracker {
         state.stop()
         state = Stopped()
     }
+
+    fun isTracking() =
+            state is Tracking
 }
 
 sealed class TrackerState {
