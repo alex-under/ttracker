@@ -6,7 +6,6 @@ import ru.alexunder.ttracker.core.WorkLog
 import ru.alexunder.ttracker.core.events.RxBus
 import ru.alexunder.ttracker.core.events.WorkItemAdded
 import tornadofx.*
-import java.time.format.DateTimeFormatter
 
 class WorkLogController : Controller() {
     private val workLog = WorkLog
@@ -22,7 +21,6 @@ class WorkLogController : Controller() {
 }
 
 class WorkLogView : View("Work log") {
-    private val dateTimeFormatter = DateTimeFormatter.ofPattern("hh:MM")
     private val controller: WorkLogController by inject()
 
     override val root = tableview(controller.workItems) {
@@ -33,12 +31,12 @@ class WorkLogView : View("Work log") {
         }
         readonlyColumn("from", WorkItem::from) {
             value { param ->
-                param.value.from.format(dateTimeFormatter)
+                param.value.from.format(Formats.hourMinutes)
             }
         }
         readonlyColumn("to", WorkItem::to) {
             value { param ->
-                param.value.to.format(dateTimeFormatter)
+                param.value.to.format(Formats.hourMinutes)
             }
         }
 

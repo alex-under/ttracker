@@ -35,7 +35,9 @@ class SysTray(
     private fun subscribeForTrackerEvents(tray: SystemTray) {
         RxBus.listen(TrackingStarted::class.java).subscribe { startEvent ->
             tray.setImage(Resources.activeImage)
-            tray.status = "tracking ${startEvent.task.name} from ${startEvent.startedAt}"
+            tray.status =
+                    "tracking '${startEvent.task.name}' " +
+                    "from ${startEvent.startedAt.format(Formats.hourMinutes)}"
             stopMenuItem.enabled = true
         }
         RxBus.listen(TrackingStopped::class.java).subscribe { _ ->
