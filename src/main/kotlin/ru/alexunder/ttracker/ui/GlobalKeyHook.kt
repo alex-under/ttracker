@@ -74,6 +74,6 @@ class EventConsumer {
     }
 
     fun tryConsumeEvent(e: NativeKeyEvent) {
-        field.setShort(e, 0x01.toShort()) // try to consume event
+        field.setShort(e, 0x01.toShort())
     }
 }
