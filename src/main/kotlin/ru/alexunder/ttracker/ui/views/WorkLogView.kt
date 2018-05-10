@@ -1,7 +1,10 @@
 package ru.alexunder.ttracker.ui.views
 
 import javafx.beans.property.SimpleListProperty
-import ru.alexunder.ttracker.core.StatItem
+import javafx.beans.property.SimpleObjectProperty
+import javafx.geometry.Orientation
+import javafx.util.StringConverter
+import ru.alexunder.ttracker.core.DayStatItem
 import ru.alexunder.ttracker.core.WorkItem
 import ru.alexunder.ttracker.core.WorkLog
 import ru.alexunder.ttracker.core.events.RxBus
@@ -12,17 +15,64 @@ import java.time.LocalDate
 
 class WorkLogController : Controller() {
     private val workLog = WorkLog
-    val workItems: SimpleListProperty<WorkItem> = SimpleListProperty()
-    val statItems: SimpleListProperty<StatItem> = SimpleListProperty()
+    val selectedDate = SimpleObjectProperty<LocalDate>(LocalDate.now())
+    val workItems = SimpleListProperty<WorkItem>()
+    val dayStatItems = SimpleListProperty<DayStatItem>()
 
     init {
-        workItems.value = workLog.workItems().observable()
-        statItems.value = workLog.getDayStats(LocalDate.now()).observable()
+        refreshLists()
 
         RxBus.listen(WorkItemAdded::class.java).subscribe { _ ->
-            workItems.invalidate()
-            statItems.value = workLog.getDayStats(LocalDate.now()).observable()
+            refreshLists()
         }
+        selectedDate.addListener { _ ->
+            refreshLists()
+        }
+    }
+
+    private fun refreshLists() {
+        workItems.value = workLog.dayWorkItems(selectedDate.value).observable()
+        dayStatItems.value = workLog.getDayStats(selectedDate.value).observable()
+    }
+}
+
+class DateSelectView : View() {
+    private val controller: WorkLogController by inject()
+
+    override val root = hbox {
+        button {
+            text = "<"
+            setOnAction {
+                controller.selectedDate.value = controller.selectedDate.value.minusDays(1)
+            }
+        }
+        datepicker {
+            bind(controller.selectedDate)
+
+            converter = object : StringConverter<LocalDate>() {
+                private val format = Formats.simpleDate
+
+                override fun toString(date: LocalDate?): String =
+                        date?.format(format) ?: ""
+
+                override fun fromString(string: String?): LocalDate =
+                        LocalDate.parse(string ?: "", format)
+            }
+        }
+        button {
+            text = ">"
+            setOnAction {
+                controller.selectedDate.value = controller.selectedDate.value.plusDays(1)
+            }
+        }
+        button {
+            text = "today"
+            setOnAction {
+                controller.selectedDate.value = LocalDate.now()
+            }
+        }
+
+        fitToParentSize()
     }
 }
 
@@ -53,27 +103,35 @@ class WorkItemsView : View() {
 class WorkStatView : View() {
     private val controller: WorkLogController by inject()
 
-    override val root = tableview(controller.statItems) {
-        readonlyColumn("task", StatItem::task) {
+    override val root = tableview(controller.dayStatItems) {
+        readonlyColumn("task", DayStatItem::task) {
             value { param ->
                 param.value.task.name
             }
         }
-        readonlyColumn("today", StatItem::task) {
+        readonlyColumn("today", DayStatItem::task) {
             value { param ->
-                param.value.todayDuration.toString()
+                param.value.dayDuration.toString()
+            }
+        }
+        readonlyColumn("total", DayStatItem::task) {
+            value { param ->
+                param.value.totalDuration.toString()
             }
         }
     }
 }
 
 class WorkLogView : View("Work log") {
+    private val dateSelectView: DateSelectView by inject()
     private val workItemsView: WorkItemsView by inject()
     private val workStatView: WorkStatView by inject()
 
     override val root = vbox {
-        add(workItemsView)
-        add(workStatView)
-        isFocusTraversable = false
+        add(dateSelectView)
+        splitpane(Orientation.VERTICAL) {
+            add(workItemsView)
+            add(workStatView)
+        }
     }
 }
