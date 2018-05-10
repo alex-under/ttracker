@@ -4,6 +4,7 @@ data class Task(
         val id: Long,
         val name: String) {
 
+    // todo simplify equals/hashCode
     override fun equals(other: Any?): Boolean =
             when (other) {
                 null -> false
