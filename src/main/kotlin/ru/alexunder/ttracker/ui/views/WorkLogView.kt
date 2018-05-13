@@ -10,10 +10,9 @@ import ru.alexunder.ttracker.core.WorkLog
 import ru.alexunder.ttracker.core.events.RxBus
 import ru.alexunder.ttracker.core.events.WorkItemAdded
 import ru.alexunder.ttracker.ui.Formats
+import ru.alexunder.ttracker.ui.toHoursString
 import tornadofx.*
-import java.time.Duration
 import java.time.LocalDate
-import java.util.concurrent.TimeUnit
 
 class WorkLogController : Controller() {
     private val workLog = WorkLog
@@ -124,12 +123,6 @@ class WorkStatView : View() {
     }
 }
 
-fun Duration.toHoursString(): String {
-    val hours = toHours()
-    val minutes = toMinutes() % TimeUnit.HOURS.toMinutes(1)
-    return if (hours > 0) "${hours}h ${minutes}m"
-    else "${minutes}m"
-}
 
 class WorkLogView : View("Work log") {
     private val dateSelectView: DateSelectView by inject()

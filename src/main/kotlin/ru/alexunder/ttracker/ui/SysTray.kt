@@ -5,7 +5,9 @@ import dorkbox.systemTray.SystemTray
 import dorkbox.util.JavaFX
 import javafx.stage.Stage
 import ru.alexunder.ttracker.core.Tracker
+import ru.alexunder.ttracker.core.WorkLog
 import ru.alexunder.ttracker.core.events.RxBus
+import ru.alexunder.ttracker.core.events.TrackingInProgress
 import ru.alexunder.ttracker.core.events.TrackingStarted
 import ru.alexunder.ttracker.core.events.TrackingStopped
 import java.awt.event.ActionListener
@@ -18,6 +20,9 @@ class SysTray(
 
     private val tracker = Tracker
     private lateinit var stopMenuItem: MenuItem
+    private lateinit var workedDurationMenuItem: MenuItem
+    private val worklog = WorkLog
+    private var workedDuration = worklog.workedDuration()
 
     init {
         val tray = initTray()
@@ -33,21 +38,30 @@ class SysTray(
     }
 
     private fun subscribeForTrackerEvents(tray: SystemTray) {
-        RxBus.subscribe(TrackingStarted::class) { startEvent ->
+        RxBus.subscribe(TrackingStarted::class) {
             tray.setImage(Resources.activeImage)
             tray.status =
-                    "tracking '${startEvent.task.name}' " +
-                    "from ${startEvent.startedAt.format(Formats.hourMinutes)}"
+                    "Tracking '${it.task.name}' " +
+                    "from ${it.startedAt.format(Formats.hourMinutes)}"
             stopMenuItem.enabled = true
         }
-        RxBus.subscribe(TrackingStopped::class) { _ ->
+        RxBus.subscribe(TrackingStopped::class) {
             tray.setImage(Resources.inactiveImage)
             tray.status = "idle"
             stopMenuItem.enabled = false
         }
+        RxBus.subscribe(TrackingInProgress::class) {
+            workedDuration = worklog.workedDuration().plus(it.duration)
+            workedDurationMenuItem.text = "Worked ${workedDuration.toHoursString()}"
+        }
     }
 
     private fun buildMenu(systemTray: SystemTray) {
+
+        workedDurationMenuItem = systemTray.menu.add(MenuItem("Worked ${workedDuration.toHoursString()}"))
+        workedDurationMenuItem.enabled = false
+
+        systemTray.menu.add(JSeparator())
 
         systemTray.menu.add(MenuItem("Select task...", ActionListener {
             JavaFX.dispatch {

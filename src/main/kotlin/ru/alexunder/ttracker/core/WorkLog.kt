@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 object WorkLog {
 
-    private val workItems : MutableList<WorkItem> = ArrayList()
+    private val workItems: MutableList<WorkItem> = ArrayList()
 
     init {
         workItems.addAll(WorkLogKeeper.readWorkItems())
@@ -25,10 +25,10 @@ object WorkLog {
         RxBus.publish(WorkItemAdded(workItem))
     }
 
-    fun allWorkItems() : List<WorkItem> =
+    fun allWorkItems(): List<WorkItem> =
             workItems
 
-    fun dayWorkItems(day: LocalDate) : List<WorkItem> =
+    fun dayWorkItems(day: LocalDate): List<WorkItem> =
             workItems.filter { it.from.toLocalDate() == day }
 
     fun dayStats(day: LocalDate): List<DayStatItem> =
@@ -37,7 +37,12 @@ object WorkLog {
                     .groupBy { it.task }
                     .map { entry -> DayStatItem(entry.key, day, entry.value) }
 
-    private fun dayTasks(day: LocalDate) : Set<Task> =
+    fun workedDuration(): Duration =
+            dayWorkItems(LocalDate.now())
+                    .map { it.duration }
+                    .fold(Duration.ZERO) { first, second -> first.plus(second) }
+
+    private fun dayTasks(day: LocalDate): Set<Task> =
             dayWorkItems(day)
                     .map { it.task }
                     .toSet()
