@@ -11,7 +11,9 @@ import ru.alexunder.ttracker.core.events.RxBus
 import ru.alexunder.ttracker.core.events.WorkItemAdded
 import ru.alexunder.ttracker.ui.Formats
 import tornadofx.*
+import java.time.Duration
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 
 class WorkLogController : Controller() {
     private val workLog = WorkLog
@@ -111,15 +113,22 @@ class WorkStatView : View() {
         }
         readonlyColumn("today", DayStatItem::task) {
             value { param ->
-                param.value.dayDuration.toString()
+                param.value.dayDuration.toHoursString()
             }
         }
         readonlyColumn("total", DayStatItem::task) {
             value { param ->
-                param.value.totalDuration.toString()
+                param.value.totalDuration.toHoursString()
             }
         }
     }
+}
+
+fun Duration.toHoursString(): String {
+    val hours = toHours()
+    val minutes = toMinutes() % TimeUnit.HOURS.toMinutes(1)
+    return if (hours > 0) "${hours}h ${minutes}m"
+    else "${minutes}m"
 }
 
 class WorkLogView : View("Work log") {
