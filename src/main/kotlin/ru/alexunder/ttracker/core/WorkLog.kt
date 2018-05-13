@@ -19,6 +19,8 @@ object WorkLog {
         workItems.add(WorkItem(Task(101, "meeting"), date("2018-05-08T09:45:00"), date("2018-05-08T10:30:00")))
         workItems.add(WorkItem(Task(107, "implement"), date("2018-05-08T10:30:00"), date("2018-05-08T10:50:00")))
         workItems.add(WorkItem(Task(108, "implem"), date("2018-05-08T13:30:00"), date("2018-05-08T15:30:00")))
+
+        println(WorkLogWriter.getMe())
     }
 
     private fun date(string: String): LocalDateTime =
