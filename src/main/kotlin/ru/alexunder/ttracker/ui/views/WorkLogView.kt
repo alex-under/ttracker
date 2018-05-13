@@ -24,7 +24,7 @@ class WorkLogController : Controller() {
     init {
         refreshLists()
 
-        RxBus.listen(WorkItemAdded::class.java).subscribe { _ ->
+        RxBus.subscribe(WorkItemAdded::class) { _ ->
             refreshLists()
         }
         selectedDate.addListener { _ ->
