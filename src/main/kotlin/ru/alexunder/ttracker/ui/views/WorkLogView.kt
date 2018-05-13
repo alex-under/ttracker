@@ -34,7 +34,7 @@ class WorkLogController : Controller() {
 
     private fun refreshLists() {
         workItems.value = workLog.dayWorkItems(selectedDate.value).observable()
-        dayStatItems.value = workLog.getDayStats(selectedDate.value).observable()
+        dayStatItems.value = workLog.dayStats(selectedDate.value).observable()
     }
 }
 
