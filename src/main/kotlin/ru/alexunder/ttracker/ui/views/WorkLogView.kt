@@ -97,6 +97,12 @@ class WorkItemsView : View() {
             }
         }
 
+        readonlyColumn("len", WorkItem::duration) {
+            value {
+                it.value.duration.toHoursString()
+            }
+        }
+
         columnResizePolicy = SmartResize.POLICY
     }
 }
