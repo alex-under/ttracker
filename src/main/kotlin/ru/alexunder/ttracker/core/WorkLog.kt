@@ -1,7 +1,9 @@
 package ru.alexunder.ttracker.core
 
 import ru.alexunder.ttracker.core.events.RxBus
+import ru.alexunder.ttracker.core.events.TrackingStopped
 import ru.alexunder.ttracker.core.events.WorkItemAdded
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -11,6 +13,9 @@ object WorkLog {
 
     init {
         workItems.addAll(WorkLogKeeper.readWorkItems())
+        RxBus.subscribe(TrackingStopped::class) {
+            addItem(it.task, it.startedAt, it.stoppedAt)
+        }
     }
 
     fun addItem(task: Task, from: LocalDateTime, to: LocalDateTime) {

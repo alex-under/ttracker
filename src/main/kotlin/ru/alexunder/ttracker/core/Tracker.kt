@@ -7,12 +7,11 @@ import java.time.LocalDateTime
 
 object Tracker {
 
-    private val workLog = WorkLog
     private var state: TrackerState = Stopped()
 
     fun startTracking(task: Task) {
         state.stop()
-        state = Tracking(task = task, workLog = workLog)
+        state = Tracking(task)
         println("tracking task: $task")
     }
 
@@ -30,25 +29,19 @@ sealed class TrackerState {
     abstract fun stop()
 }
 
-data class Stopped(
-        val at: LocalDateTime = LocalDateTime.now()
-) : TrackerState() {
+class Stopped(val at: LocalDateTime = LocalDateTime.now()) : TrackerState() {
     override fun stop() {}
 }
 
-data class Tracking(
-        val task: Task,
-        val from: LocalDateTime = LocalDateTime.now(),
-        val workLog: WorkLog
-) : TrackerState() {
+class Tracking(
+        private val task: Task,
+        private val from: LocalDateTime = LocalDateTime.now()) : TrackerState() {
 
     init {
         RxBus.publish(TrackingStarted(task, from))
     }
 
     override fun stop() {
-        val to = LocalDateTime.now()
-        RxBus.publish(TrackingStopped(task, from, to))
-        workLog.addItem(task = task, from = from, to = to)  // todo log by event
+        RxBus.publish(TrackingStopped(task, from, LocalDateTime.now()))
     }
 }
