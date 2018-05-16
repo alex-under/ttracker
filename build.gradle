@@ -9,13 +9,21 @@ plugins {
     id "org.jetbrains.kotlin.jvm" version "1.2.41"
 }
 
-
 repositories {
     mavenCentral()
 }
 
 compileKotlin {
     kotlinOptions.jvmTarget = 1.8
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "ru.alexunder.ttracker.ui.TaskTrackerApp"
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 dependencies {
