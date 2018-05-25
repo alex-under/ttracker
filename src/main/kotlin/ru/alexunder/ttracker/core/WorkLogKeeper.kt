@@ -4,7 +4,6 @@ import ru.alexunder.ttracker.core.events.RxBus
 import ru.alexunder.ttracker.core.events.WorkItemAdded
 import java.io.IOException
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -12,7 +11,7 @@ import java.util.*
 
 object WorkLogKeeper {
 
-    private val filePath = Paths.get("${System.getProperty("user.home")}/.ttracker_log.txt")
+    private val filePath = FileNames.workLog.path
     private val dateTimeStoreFormat = DateTimeFormatter.ISO_DATE_TIME
     private const val delimiter = '\t'
 
