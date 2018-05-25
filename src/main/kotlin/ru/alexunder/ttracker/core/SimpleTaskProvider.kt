@@ -11,8 +11,8 @@ interface TaskProvider {
 
 class SimpleTaskProvider : TaskProvider {
 
-    private var idSeq: Long = 0
-    private val tasks: MutableList<Task> = mutableListOf(
+    private var idSeq = 0L
+    private val tasks = mutableListOf(
             Task(id = nextId(), name = "create something"),
             Task(id = nextId(), name = "qa"),
             Task(id = nextId(), name = "meeting"),
