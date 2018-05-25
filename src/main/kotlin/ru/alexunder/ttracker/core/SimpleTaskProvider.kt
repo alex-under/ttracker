@@ -1,6 +1,14 @@
 package ru.alexunder.ttracker.core
 
-class TaskProvider {
+interface TaskProvider {
+    fun createTask(name: String) : Task
+    fun getAllTasks() : List<Task>
+    fun getTaskById(id: Long): Task
+    fun findTaskByName(name: String): List<Task>
+}
+
+
+class SimpleTaskProvider : TaskProvider {
 
     private var idSeq: Long = 0
     private val tasks: MutableList<Task> = mutableListOf(
@@ -10,19 +18,18 @@ class TaskProvider {
             Task(id = nextId(), name = "code upload"),
             Task(id = nextId(), name = "do nothing"))
 
-    fun createTask(name: String) : Task {
+    override fun createTask(name: String) : Task {
         val task = Task(nextId(), name)
         tasks.add(task)
         return task
     }
 
-    fun getAllTasks() =
-            tasks.toList()
+    override fun getAllTasks() : List<Task> = tasks
 
-    fun getTaskById(id: Long): Task =
+    override fun getTaskById(id: Long): Task =
             tasks.first { it.id == id }
 
-    fun findTaskByName(name: String): List<Task> =
+    override fun findTaskByName(name: String): List<Task> =
             tasks.filter { it.name.contains(other = name, ignoreCase = true) }
 
     private fun nextId() = ++idSeq

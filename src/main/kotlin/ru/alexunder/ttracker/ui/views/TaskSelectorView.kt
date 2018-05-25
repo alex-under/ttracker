@@ -4,6 +4,7 @@ import javafx.beans.property.Property
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.input.KeyCode
+import ru.alexunder.ttracker.core.SimpleTaskProvider
 import ru.alexunder.ttracker.core.Task
 import ru.alexunder.ttracker.core.TaskProvider
 import ru.alexunder.ttracker.core.Tracker
@@ -11,7 +12,7 @@ import tornadofx.*
 
 
 class TaskSelectorController : Controller() {
-    private val taskProvider = TaskProvider()
+    private val taskProvider : TaskProvider = SimpleTaskProvider()
     private val taskTracker = Tracker
     val tasks: SimpleListProperty<Task> = SimpleListProperty()
     val selectedTask: Property<Task> = SimpleObjectProperty()
