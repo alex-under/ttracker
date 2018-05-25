@@ -5,6 +5,7 @@ interface TaskProvider {
     fun getAllTasks() : List<Task>
     fun getTaskById(id: Long): Task
     fun findTaskByName(name: String): List<Task>
+    fun deleteTask(id: Long)
 }
 
 
@@ -31,6 +32,11 @@ class SimpleTaskProvider : TaskProvider {
 
     override fun findTaskByName(name: String): List<Task> =
             tasks.filter { it.name.contains(other = name, ignoreCase = true) }
+
+    override fun deleteTask(id: Long) {
+        val task = getTaskById(id)
+        tasks.remove(task)
+    }
 
     private fun nextId() = ++idSeq
 }
