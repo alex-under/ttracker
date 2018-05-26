@@ -7,11 +7,11 @@ object FileNames {
     private val userHome = FilePath(System.getProperty("user.home"))
     private val root = FilePath("${userHome.name}/.ttracker")
 
-    val workLog  = FilePath("$root/work-log.txt")
-    val tasks = FilePath("$root/tasks.txt")
+    val workLog  = FilePath("${root.name}/work-log.txt")
+    val tasks = FilePath("${root.name}/tasks.txt")
 
     init {
-        Files.createDirectory(root.path)
+        Files.createDirectories(root.path)
     }
 }
 
