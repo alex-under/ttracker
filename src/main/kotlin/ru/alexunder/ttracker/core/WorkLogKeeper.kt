@@ -20,7 +20,7 @@ object WorkLogKeeper {
             Files.write(filePath,
                     listOf(it.workItem.toFileString()),
                     Charsets.UTF_8,
-                    StandardOpenOption.APPEND)
+                    StandardOpenOption.CREATE, StandardOpenOption.APPEND)
         }
     }
 
