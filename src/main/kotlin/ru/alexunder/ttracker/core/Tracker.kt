@@ -14,28 +14,30 @@ object Tracker {
     private var state: TrackerState = Stopped()
 
     fun startTracking(task: Task) {
-        state.stop()
-        state = Tracking(task)
-        println("tracking task: $task")
+        state = state.start(task)
     }
 
     fun stopTracking() {
-        println("stopping track")
-        state.stop()
-        state = Stopped()
+        state = state.stop()
     }
 
-    fun isTracking() =
-            state is Tracking
+    fun isTracking() = state.isTracking()
 }
+
 
 sealed class TrackerState {
-    abstract fun stop()
+    abstract fun stop(): TrackerState
+    abstract fun start(task: Task): TrackerState
+    abstract fun isTracking(): Boolean
 }
 
+
 class Stopped(val at: LocalDateTime = LocalDateTime.now()) : TrackerState() {
-    override fun stop() {}
+    override fun start(task: Task) = Tracking(task)
+    override fun isTracking() = false
+    override fun stop() = this
 }
+
 
 class Tracking(
         private val task: Task,
@@ -46,15 +48,29 @@ class Tracking(
 
     init {
         RxBus.publish(TrackingStarted(task, from))
-        timer = timer(daemon = true, period = progressSendingPeriod, initialDelay = progressSendingPeriod) {
+        timer = timer(
+                daemon = true,
+                period = progressSendingPeriod,
+                initialDelay = progressSendingPeriod) {
             sendTrackingProgress()
         }
     }
 
-    override fun stop() {
+    override fun start(task: Task): TrackerState {
+        if (this.task == task) {
+            return this
+        }
+        stop()
+        return Tracking(task)
+    }
+
+    override fun stop(): TrackerState {
         timer.cancel()
         RxBus.publish(TrackingStopped(task, from, LocalDateTime.now()))
+        return Stopped()
     }
+
+    override fun isTracking(): Boolean = true
 
     private fun sendTrackingProgress() {
         println("tracking in progress: $task")
