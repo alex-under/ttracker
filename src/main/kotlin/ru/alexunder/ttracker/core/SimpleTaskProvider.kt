@@ -4,7 +4,7 @@ interface TaskProvider {
     fun createTask(name: String) : Task
     fun getAllTasks() : List<Task>
     fun getTaskById(id: Long): Task
-    fun findTaskByName(name: String): List<Task>
+    fun findTasksByName(name: String): List<Task>
     fun deleteTask(id: Long)
 }
 
@@ -30,7 +30,7 @@ class SimpleTaskProvider : TaskProvider {
     override fun getTaskById(id: Long): Task =
             tasks.first { it.id == id }
 
-    override fun findTaskByName(name: String): List<Task> =
+    override fun findTasksByName(name: String): List<Task> =
             tasks.filter { it.name.contains(other = name, ignoreCase = true) }
 
     override fun deleteTask(id: Long) {

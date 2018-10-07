@@ -4,15 +4,15 @@ import javafx.beans.property.Property
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.input.KeyCode
-import ru.alexunder.ttracker.core.SimpleTaskProvider
 import ru.alexunder.ttracker.core.Task
 import ru.alexunder.ttracker.core.TaskProvider
 import ru.alexunder.ttracker.core.Tracker
+import ru.alexunder.ttracker.core.taskprovider.FileTaskProvider
 import tornadofx.*
 
 
 class TaskSelectorController : Controller() {
-    private val taskProvider : TaskProvider = SimpleTaskProvider()
+    private val taskProvider : TaskProvider = FileTaskProvider()
     private val taskTracker = Tracker
     val tasks: SimpleListProperty<Task> = SimpleListProperty()
     val selectedTask: Property<Task> = SimpleObjectProperty()
@@ -23,7 +23,7 @@ class TaskSelectorController : Controller() {
 
     fun search(name: String) {
         runAsync {
-            taskProvider.findTaskByName(name)
+            taskProvider.findTasksByName(name)
         } ui {
             tasks.value.clear()
             tasks.value.addAll(it)
@@ -37,6 +37,9 @@ class TaskSelectorController : Controller() {
     }
 
     fun startNew(name: String) {
+        if (name.isEmpty()) {
+            return
+        }
         val createdTask = taskProvider.createTask(name)
         taskTracker.startTracking(createdTask)
         notifyStateChange()
@@ -84,6 +87,7 @@ class SearchQueryView : View() {
                 text = if (task == null) "create" else "start"
             }
             subscribe<EnterKeyPressed> {
+                // todo check why callback is called multiple times
                 start()
             }
             action {
